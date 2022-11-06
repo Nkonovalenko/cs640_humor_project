@@ -29,7 +29,7 @@ FINETUNED = ""
 # Function to parse the captions JSON
 caption_pairs = {}
 def parse_captions():
-    with open('nycwinners.json') as caption_file:
+    with open('./Data/nycwinners.json') as caption_file:
         caption_winners = json.load(caption_file)
 
     for contest in caption_winners:
@@ -41,7 +41,6 @@ def parse_captions():
         final_captions = [finalists[caption_num]['text'] for caption_num in range(len(finalists))]
 
         caption_pairs[title] = final_captions
-
 
 # Dictionary tracking prompt keys to GPT-output values
 prompt_response = {}
@@ -72,7 +71,7 @@ def request(prompt, FINETUNED):
 
 idioms = []
 def parse_idioms():
-    idioms_file = open('idioms.txt', 'r')
+    idioms_file = open('Data/idioms.txt', 'r')
 
     for line in idioms_file.readlines():
         line = line.replace('\n', "")
@@ -142,25 +141,35 @@ def gpt_idioms(start_index, end_index):
 '''
 
 
-captions = False
+captions = True
 
 if captions:
     parse_captions()
 
     start_index = 10
-    end_index = 11
+    end_index = 12
 
 
     for index in range(start_index, end_index):
         contest = list(caption_pairs)[index]
-
         for caption in caption_pairs[contest]:
-            prompt = "Tell a joke about " + caption[1:-1]
-
+            prompt = "Give a funny scenario for " + caption[1:-1]
 
             response = openai.Completion.create(
                 model="text-davinci-002",
-                prompt=prompt,
+                prompt="""Give a funny scenario for. 
+                prompt: Give a funny scenario for First you must gain their trust.
+                completion: A man wearing a full body mouse costume and writing on a clipboard is standing next to another man in a lab coat. The men are surrounded by cages that are full of rats.Two scientists are talking in a lab, with a cage full of mice off to the left. One of the scientists is dressed like a rat.A man dressed as a giant rat is checking the mice in the cages. A scientist looks on.
+                ###
+                prompt: Give a funny scenario for Frank called to say he'll be late, he's stuck at the office.
+                completion: An office meeting is taking place inside a subway cart. Everyone at the meeting is acting like this is normal.Men are sitting around a table. But the table is in the subway.A group of businesspeople are having a meeting in a subway car. They are talking to a CEO.
+                ###
+                prompt: Give a funny scenario for This better be good. That floor was waxed last night!"
+                completion: A dirty man crawls on the ground towards a group of people sitting down. They are looking at him in astonishment with a sign above them that says \"Emergency Hotline\".A dirty exhausted man is crawling toward an emergency hotline booth. One of the operators is yelling at him.A man is on the floor and he is very dirty. An emergency hotline sign is up on the wall. A woman is yelling at the man on the floor."
+                ###
+                prompt: Give a funny scenario for Remember that time you made me laugh and people came out of my nose?
+                completion":Two large reptile monsters are destroying a whole city. One of them looks happily at the other as it eats.Two monsters are rampaging through a city. They're eating the buildings.Two dinosaurs are devouring a city. One is gobbling up a building
+                """+prompt,
                 temperature=0.6,
                 max_tokens=150,
                 top_p=1,
@@ -168,10 +177,16 @@ if captions:
                 presence_penalty=1,
                 )
             response_text = response['choices'][0]['text']
-
             print("Prompt: ", prompt)
             print("Response: ", response_text)
             print('-------')
+
+    # response = openai.Image.create(
+    #     prompt="a white siamese cat",
+    #     n=1,
+    #     size="1024x1024"
+    # )
+    # image_url = response['data'][0]['url']
 
 '''
 #################################################################################
@@ -182,7 +197,7 @@ if captions:
 #################################################################################
 #################################################################################
 '''
-run_idioms = True
+run_idioms = False
 if (run_idioms):
     # First we need to parse the idioms
     parse_idioms()
@@ -192,3 +207,5 @@ if (run_idioms):
 
     # Make requests to GPT
     gpt_idioms(start_index, end_index)
+
+
