@@ -140,8 +140,12 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = False
-make_text = True
+captions = True
+make_text = False
+length = 5      ## how many shots learning
+start_index = 50
+end_index = 55              ## declare test range, from 50 to ~
+
 
 if captions:
     ############################### generate text ######################
@@ -149,7 +153,6 @@ if captions:
         f=open('./Data/cleaned3.json')
         cleaned = json.load(f)
         fewshots =""""""
-        length =0
         for i in range(length): 
             fewshots+="""prompt: """;
             fewshots+=cleaned['info'][i]['prompt']
@@ -157,8 +160,6 @@ if captions:
             fewshots+=cleaned['info'][i]['completion']
             if(i<length-1) : fewshots+=""" ### """
 
-        start_index = 50
-        end_index = 65
         res = []
         for index in range(start_index, end_index):
             prompt = "Give a funny scenario for " + cleaned['info'][index]['prompt']
@@ -175,19 +176,35 @@ if captions:
             response_text = response['choices'][0]['text']
             content = {"prompt":prompt, "completion":response_text}
             res.append(content)
-            
-        with open('./Results/gpt_results.json', "w") as file:
-            file.write('{'+'"'+"info" +'"'+':'+ '[')
-            for i in range(len(res)):
-                file.write(json.dumps(dict(res[i])))
-                if i<len(res)-1: file.write(","+"\n")
-            file.write(']'+'}')
+
+        if length == 0:   
+            with open('./Results/gpt_results_0shots.json', "w") as file:
+                file.write('{'+'"'+"info" +'"'+':'+ '[')
+                for i in range(len(res)):
+                    file.write(json.dumps(dict(res[i])))
+                    if i<len(res)-1: file.write(","+"\n")
+                file.write(']'+'}')
+        else if length == 5:
+            with open('./Results/gpt_results_15shots.json', "w") as file:
+                file.write('{'+'"'+"info" +'"'+':'+ '[')
+                for i in range(len(res)):
+                    file.write(json.dumps(dict(res[i])))
+                    if i<len(res)-1: file.write(","+"\n")
+                file.write(']'+'}')
+        else:
+            with open('./Results/gpt_results_50shots.json', "w") as file:
+                file.write('{'+'"'+"info" +'"'+':'+ '[')
+                for i in range(len(res)):
+                    file.write(json.dumps(dict(res[i])))
+                    if i<len(res)-1: file.write(","+"\n")
+                file.write(']'+'}')
 
     ############################### text to image ######################
     f=open('./Results/gpt_results.json')
     gptres = json.load(f)
     dalle_res = []
     for key in gptres['info']: 
+        # print("key: "+key['completion'])
         response = openai.Image.create(
             prompt=key['completion'],
             n=1,
