@@ -180,7 +180,7 @@ if captions:
             file.write('{'+'"'+"info" +'"'+':'+ '[')
             for i in range(len(res)):
                 file.write(json.dumps(dict(res[i])))
-                if i<len(res)-1: file.write(","+)
+                if i<len(res)-1: file.write(","+"\n")
             file.write(']'+'}')
 
     ############################### text to image ######################
