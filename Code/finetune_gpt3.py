@@ -140,11 +140,11 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = True
+captions = False
 make_text = False
 length = 5      ## how many shots learning
 start_index = 50
-end_index = 55              ## declare test range, from 50 to ~
+end_index = 55    ## declare test range, from 50 to ~
 
 
 if captions:
