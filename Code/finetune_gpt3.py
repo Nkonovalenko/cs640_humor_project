@@ -184,7 +184,7 @@ if captions:
                     file.write(json.dumps(dict(res[i])))
                     if i<len(res)-1: file.write(","+"\n")
                 file.write(']'+'}')
-        else if length == 5:
+        elif length == 5:
             with open('./Results/gpt_results_15shots.json', "w") as file:
                 file.write('{'+'"'+"info" +'"'+':'+ '[')
                 for i in range(len(res)):
