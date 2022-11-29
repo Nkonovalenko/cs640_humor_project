@@ -140,36 +140,32 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-
-captions = True
+captions = False
+make_text = True
 
 if captions:
-    parse_captions()
+    ############################### generate text ######################
+    if make_text:
+        f=open('./Data/cleaned3.json')
+        cleaned = json.load(f)
+        fewshots =""""""
+        length =0
+        for i in range(length): 
+            fewshots+="""prompt: """;
+            fewshots+=cleaned['info'][i]['prompt']
+            fewshots+=""" completion: """
+            fewshots+=cleaned['info'][i]['completion']
+            if(i<length-1) : fewshots+=""" ### """
 
-    start_index = 10
-    end_index = 12
-
-
-    for index in range(start_index, end_index):
-        contest = list(caption_pairs)[index]
-        for caption in caption_pairs[contest]:
-            prompt = "Give a funny scenario for " + caption[1:-1]
-
+        start_index = 50
+        end_index = 65
+        res = []
+        for index in range(start_index, end_index):
+            prompt = "Give a funny scenario for " + cleaned['info'][index]['prompt']
+            # print("""Give a funny scenario. ### """+fewshots+prompt)
             response = openai.Completion.create(
                 model="text-davinci-002",
-                prompt="""Give a funny scenario for. 
-                prompt: Give a funny scenario for First you must gain their trust.
-                completion: A man wearing a full body mouse costume and writing on a clipboard is standing next to another man in a lab coat. The men are surrounded by cages that are full of rats.Two scientists are talking in a lab, with a cage full of mice off to the left. One of the scientists is dressed like a rat.A man dressed as a giant rat is checking the mice in the cages. A scientist looks on.
-                ###
-                prompt: Give a funny scenario for Frank called to say he'll be late, he's stuck at the office.
-                completion: An office meeting is taking place inside a subway cart. Everyone at the meeting is acting like this is normal.Men are sitting around a table. But the table is in the subway.A group of businesspeople are having a meeting in a subway car. They are talking to a CEO.
-                ###
-                prompt: Give a funny scenario for This better be good. That floor was waxed last night!"
-                completion: A dirty man crawls on the ground towards a group of people sitting down. They are looking at him in astonishment with a sign above them that says \"Emergency Hotline\".A dirty exhausted man is crawling toward an emergency hotline booth. One of the operators is yelling at him.A man is on the floor and he is very dirty. An emergency hotline sign is up on the wall. A woman is yelling at the man on the floor."
-                ###
-                prompt: Give a funny scenario for Remember that time you made me laugh and people came out of my nose?
-                completion":Two large reptile monsters are destroying a whole city. One of them looks happily at the other as it eats.Two monsters are rampaging through a city. They're eating the buildings.Two dinosaurs are devouring a city. One is gobbling up a building
-                """+prompt,
+                prompt= prompt if length==0 else """Give a funny scenario. ### """+fewshots+prompt,
                 temperature=0.6,
                 max_tokens=150,
                 top_p=1,
@@ -177,16 +173,34 @@ if captions:
                 presence_penalty=1,
                 )
             response_text = response['choices'][0]['text']
-            print("Prompt: ", prompt)
-            print("Response: ", response_text)
-            print('-------')
+            content = {"prompt":prompt, "completion":response_text}
+            res.append(content)
+            
+        with open('./Results/gpt_results.json', "w") as file:
+            file.write('{'+'"'+"info" +'"'+':'+ '[')
+            for i in range(len(res)):
+                file.write(json.dumps(dict(res[i])))
+                if i<len(res)-1: file.write(","+)
+            file.write(']'+'}')
 
-    # response = openai.Image.create(
-    #     prompt="a white siamese cat",
-    #     n=1,
-    #     size="1024x1024"
-    # )
-    # image_url = response['data'][0]['url']
+    ############################### text to image ######################
+    f=open('./Results/gpt_results.json')
+    gptres = json.load(f)
+    dalle_res = []
+    for key in gptres['info']: 
+        response = openai.Image.create(
+            prompt=key['completion'],
+            n=1,
+            size="1024x1024"
+        )
+        image_url = response['data'][0]['url']
+        content = {"prompt":key['prompt'],"url":image_url}
+        dalle_res.append(content)
+      
+    with open('./Results/dalle_results.json', "w") as file:
+        for elem in dalle_res:
+            file.write(json.dumps(dict(elem)))
+            file.write(","+'\n')
 
 '''
 #################################################################################
