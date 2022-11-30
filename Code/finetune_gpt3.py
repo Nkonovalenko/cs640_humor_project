@@ -140,9 +140,9 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = True  
+captions = False  
 make_text = True ## generate gpt3 outputs
-length = 0      ## how many shots learning
+length = 35      ## how many shots learning
 start = 50
 end = 70
 ## declare test range, from 50 to ~
