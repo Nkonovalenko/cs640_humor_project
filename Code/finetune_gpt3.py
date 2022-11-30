@@ -140,11 +140,11 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = False
-make_text = False
+captions = False  
+make_text = True ## generate gpt3 outputs
 length = 5      ## how many shots learning
-start_index = 50
-end_index = 55    ## declare test range, from 50 to ~
+start = 50
+end = 60    ## declare test range, from 50 to ~
 
 
 if captions:
@@ -161,7 +161,7 @@ if captions:
             if(i<length-1) : fewshots+=""" ### """
 
         res = []
-        for index in range(start_index, end_index):
+        for index in range(start, end):
             prompt = "Give a funny scenario for " + cleaned['info'][index]['prompt']
             # print("""Give a funny scenario. ### """+fewshots+prompt)
             response = openai.Completion.create(
@@ -185,7 +185,7 @@ if captions:
                     if i<len(res)-1: file.write(","+"\n")
                 file.write(']'+'}')
         elif length == 5:
-            with open('./Results/gpt_results_15shots.json', "w") as file:
+            with open('./Results/gpt_results_5shots.json', "w") as file:
                 file.write('{'+'"'+"info" +'"'+':'+ '[')
                 for i in range(len(res)):
                     file.write(json.dumps(dict(res[i])))
@@ -200,7 +200,12 @@ if captions:
                 file.write(']'+'}')
 
     ############################### text to image ######################
-    f=open('./Results/gpt_results.json')
+    if length ==0:
+        f=open('./Results/gpt_results_0shots.json')
+    elif length==5:
+        f=open('./Results/gpt_results_5shots.json')
+    else: 
+        f=open('./Results/gpt_results_50shots.json')
     gptres = json.load(f)
     dalle_res = []
     for key in gptres['info']: 
@@ -213,11 +218,21 @@ if captions:
         image_url = response['data'][0]['url']
         content = {"prompt":key['prompt'],"url":image_url}
         dalle_res.append(content)
-      
-    with open('./Results/dalle_results.json', "w") as file:
-        for elem in dalle_res:
-            file.write(json.dumps(dict(elem)))
-            file.write(","+'\n')
+    if length == 0: 
+        with open('./Results/dalle_results_0shot.json', "w") as file:
+            for elem in dalle_res:
+                file.write(json.dumps(dict(elem)))
+                file.write(","+'\n')
+    elif length==5:
+        with open('./Results/dalle_results_5shot.json', "w") as file:
+            for elem in dalle_res:
+                file.write(json.dumps(dict(elem)))
+                file.write(","+'\n')
+    else:
+        with open('./Results/dalle_results_50shot.json', "w") as file:
+            for elem in dalle_res:
+                file.write(json.dumps(dict(elem)))
+                file.write(","+'\n')
 
 '''
 #################################################################################
