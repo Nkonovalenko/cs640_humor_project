@@ -142,15 +142,16 @@ def gpt_idioms(start_index, end_index):
 
 captions = True  
 make_text = True ## generate gpt3 outputs
-length = 35      ## how many shots learning
+length = 0      ## how many shots learning
 start = 50
-end = 55    ## declare test range, from 50 to ~
+end = 70
+## declare test range, from 50 to ~
 
 
 if captions:
     ############################### generate text ######################
     if make_text:
-        f=open('./Data/cleaned3.json')
+        f=open('./Data/cleaned2.json')
         cleaned = json.load(f)
         fewshots =""""""
         for i in range(length): 
