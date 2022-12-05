@@ -140,11 +140,12 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = False  
+captions = True  
 make_text = True ## generate gpt3 outputs
-length = 35      ## how many shots learning
-start = 50
-end = 70
+dalle = True
+length = 5      ## how many shots learning
+start = 699    ##50~70
+end = 700
 ## declare test range, from 50 to ~
 
 
@@ -155,20 +156,21 @@ if captions:
         cleaned = json.load(f)
         fewshots =""""""
         for i in range(length): 
-            fewshots+="""prompt: """;
+            fewshots+=""" prompt: Give a funny scenario for """;
             fewshots+=cleaned['info'][i]['prompt']
             fewshots+=""" completion: """
             fewshots+=cleaned['info'][i]['completion']
-            if(i<length-1) : fewshots+=""" ### """
+            if(i<length-1) : fewshots+="""###"""
 
         res = []
         for index in range(start, end):
-            prompt = "Give a funny scenario for " + cleaned['info'][index]['prompt']
-            # print("""Give a funny scenario. ### """+fewshots+prompt)
+            prompt = " ### Give a funny scenario for " + cleaned['info'][index]['prompt'] + " completion:"
+            print("""Give a funny scenario. ###"""+fewshots+prompt)
             response = openai.Completion.create(
-                model="text-davinci-002",
+                model="text-davinci-003",
                 prompt= prompt if length==0 else """Give a funny scenario. ### """+fewshots+prompt,
                 temperature=0.6,
+                end_sequence="###",
                 max_tokens=150,
                 top_p=1,
                 frequency_penalty=1,
@@ -201,39 +203,40 @@ if captions:
                 file.write(']'+'}')
 
     ############################### text to image ######################
-    if length ==0:
-        f=open('./Results/gpt_results_0shots.json')
-    elif length==5:
-        f=open('./Results/gpt_results_5shots.json')
-    else: 
-        f=open('./Results/gpt_results_50shots.json')
-    gptres = json.load(f)
-    dalle_res = []
-    for key in gptres['info']: 
-        # print("key: "+key['completion'])
-        response = openai.Image.create(
-            prompt=key['completion'],
-            n=1,
-            size="1024x1024"
-        )
-        image_url = response['data'][0]['url']
-        content = {"prompt":key['prompt'],"url":image_url}
-        dalle_res.append(content)
-    if length == 0: 
-        with open('./Results/dalle_results_0shot.json', "w") as file:
-            for elem in dalle_res:
-                file.write(json.dumps(dict(elem)))
-                file.write(","+'\n')
-    elif length==5:
-        with open('./Results/dalle_results_5shot.json', "w") as file:
-            for elem in dalle_res:
-                file.write(json.dumps(dict(elem)))
-                file.write(","+'\n')
-    else:
-        with open('./Results/dalle_results_50shot.json', "w") as file:
-            for elem in dalle_res:
-                file.write(json.dumps(dict(elem)))
-                file.write(","+'\n')
+    if dalle:
+        if length ==0:
+            f=open('./Results/gpt_results_0shots.json')
+        elif length==5:
+            f=open('./Results/gpt_results_5shots.json')
+        else: 
+            f=open('./Results/gpt_results_50shots.json')
+        gptres = json.load(f)
+        dalle_res = []
+        for key in gptres['info']: 
+            # print("key: "+key['completion'])
+            response = openai.Image.create(
+                prompt=key['completion'],
+                n=1,
+                size="1024x1024"
+            )
+            image_url = response['data'][0]['url']
+            content = {"prompt":key['prompt'],"url":image_url}
+            dalle_res.append(content)
+        if length == 0: 
+            with open('./Results/dalle_results_0shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
+        elif length==5:
+            with open('./Results/dalle_results_5shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
+        else:
+            with open('./Results/dalle_results_50shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
 
 '''
 #################################################################################
