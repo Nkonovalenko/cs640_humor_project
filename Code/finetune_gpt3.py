@@ -140,13 +140,12 @@ def gpt_idioms(start_index, end_index):
     To get to the other side.
 '''
 
-captions = True  
-make_text = True ## generate gpt3 outputs
-dalle = True
+captions = False  
+make_text = True ## generate gpt3 outputs in /Results/gpt_results_*shot.json
+dalle = True    ##generate dalle2 outputs in /Results/dalle_results_*shots.json
 length = 32      ## how many shots learning
-start = 50    ##50~70
+start = 50    ##test set range from caption 50~70
 end = 70
-## declare test range, from 50 to ~
 
 
 if captions:
