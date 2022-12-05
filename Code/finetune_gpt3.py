@@ -143,9 +143,9 @@ def gpt_idioms(start_index, end_index):
 captions = True  
 make_text = True ## generate gpt3 outputs
 dalle = True
-length = 5      ## how many shots learning
-start = 699    ##50~70
-end = 700
+length = 32      ## how many shots learning
+start = 50    ##50~70
+end = 70
 ## declare test range, from 50 to ~
 
 
@@ -165,12 +165,12 @@ if captions:
         res = []
         for index in range(start, end):
             prompt = " ### Give a funny scenario for " + cleaned['info'][index]['prompt'] + " completion:"
-            print("""Give a funny scenario. ###"""+fewshots+prompt)
+            # print("""Give a funny scenario. ###"""+fewshots+prompt)
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt= prompt if length==0 else """Give a funny scenario. ### """+fewshots+prompt,
                 temperature=0.6,
-                end_sequence="###",
+                stop="###",
                 max_tokens=150,
                 top_p=1,
                 frequency_penalty=1,
