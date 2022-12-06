@@ -45,7 +45,7 @@ def file_generator3():
         if(data[key]['official_newyorker_finalists']==[]):
             continue  
         contest = {
-            "prompt":"Tell a joke about "+str(data[key]['official_newyorker_finalists'][0]).encode('ascii', 'ignore').decode('unicode_escape').strip('"\"'),
+            "prompt":str(data[key]['official_newyorker_finalists'][0]).encode('ascii', 'ignore').decode('unicode_escape').strip('"\"'),
             "completion": data[key]['mturk_annotations']['description_hit'][0]['image_description']+data[key]['mturk_annotations']['description_hit'][1]['image_description']+data[key]['mturk_annotations']['description_hit'][2]['image_description']
         }
         cleaned.append(contest)

@@ -2,8 +2,8 @@
 This file is part of the semester project for CS 640 at Boston University.
 It is for experiments to further investigate claims in the paper "Do Androids Laugh at Electric Sheep",
 through several experiments:
-    1) Fine Tuning GPT-3 on a set of New Yorker Caption Contest Captions, to have it describe the setting/joke where those captions would be a punchline
-        Status: Manually creating dataset for the fine-tuning
+    1) Comparing zero-shot learning with few-shot learning on GPT-3 on a set of New Yorker Caption Contest Captions, to have it describe a humourous setting on the captions and feed it to DALL-E 2 to generate funny pictures.
+        Status: Completed
     2) Running idioms through GPT-3 to see whether it can explain what those idioms mean
         Status: Completed
     3) Feeding the output of the GPT-3 explanations of idioms, into DALL-E 2, to see whether generative models could understand deeper topics in humor (such as idioms)
@@ -98,47 +98,36 @@ parse_idioms()
 #################################################################################
 '''
 
-'''
-    This section is still in progress. Manually creating a dataset that GPT can be fine tuned with.
-
-    Tried to get GPT to tell jokes with the captions being punch lines, however this fails:
-
-    Prompt:  Tell a joke about Yeah, I hate the throwback uniforms, too.
-    Response:
-
-    Why did the chicken cross the road?
-
-    To get to the other side.
-'''
-
-captions = False
-make_text = False
-length = 5      ## how many shots learning
-start_index = 50
-end_index = 55    ## declare test range, from 50 to ~
+captions = False  
+make_text = True ## generate gpt3 outputs in /Results/gpt_results_*shot.json
+dalle = True    ##generate dalle2 outputs in /Results/dalle_results_*shots.json
+length = 32      ## how many shots learning
+start = 50    ##test set range from caption 50~70
+end = 70
 
 
 if captions:
     ############################### generate text ######################
     if make_text:
-        f=open('./Data/cleaned3.json')
+        f=open('./Data/cleaned2.json')
         cleaned = json.load(f)
         fewshots =""""""
         for i in range(length): 
-            fewshots+="""prompt: """;
+            fewshots+=""" prompt: Give a funny scenario for """;
             fewshots+=cleaned['info'][i]['prompt']
             fewshots+=""" completion: """
             fewshots+=cleaned['info'][i]['completion']
-            if(i<length-1) : fewshots+=""" ### """
+            if(i<length-1) : fewshots+="""###"""
 
         res = []
-        for index in range(start_index, end_index):
-            prompt = "Give a funny scenario for " + cleaned['info'][index]['prompt']
-            # print("""Give a funny scenario. ### """+fewshots+prompt)
+        for index in range(start, end):
+            prompt = " ### Give a funny scenario for " + cleaned['info'][index]['prompt'] + " completion:"
+            # print("""Give a funny scenario. ###"""+fewshots+prompt)
             response = openai.Completion.create(
-                model="text-davinci-002",
+                model="text-davinci-003",
                 prompt= prompt if length==0 else """Give a funny scenario. ### """+fewshots+prompt,
                 temperature=0.6,
+                stop="###",
                 max_tokens=150,
                 top_p=1,
                 frequency_penalty=1,
@@ -156,7 +145,7 @@ if captions:
                     if i<len(res)-1: file.write(","+"\n")
                 file.write(']'+'}')
         elif length == 5:
-            with open('./Results/gpt_results_15shots.json', "w") as file:
+            with open('./Results/gpt_results_5shots.json', "w") as file:
                 file.write('{'+'"'+"info" +'"'+':'+ '[')
                 for i in range(len(res)):
                     file.write(json.dumps(dict(res[i])))
@@ -171,24 +160,40 @@ if captions:
                 file.write(']'+'}')
 
     ############################### text to image ######################
-    f=open('./Results/gpt_results.json')
-    gptres = json.load(f)
-    dalle_res = []
-    for key in gptres['info']: 
-        # print("key: "+key['completion'])
-        response = openai.Image.create(
-            prompt=key['completion'],
-            n=1,
-            size="1024x1024"
-        )
-        image_url = response['data'][0]['url']
-        content = {"prompt":key['prompt'],"url":image_url}
-        dalle_res.append(content)
-      
-    with open('./Results/dalle_results.json', "w") as file:
-        for elem in dalle_res:
-            file.write(json.dumps(dict(elem)))
-            file.write(","+'\n')
+    if dalle:
+        if length ==0:
+            f=open('./Results/gpt_results_0shots.json')
+        elif length==5:
+            f=open('./Results/gpt_results_5shots.json')
+        else: 
+            f=open('./Results/gpt_results_50shots.json')
+        gptres = json.load(f)
+        dalle_res = []
+        for key in gptres['info']: 
+            # print("key: "+key['completion'])
+            response = openai.Image.create(
+                prompt=key['completion'],
+                n=1,
+                size="1024x1024"
+            )
+            image_url = response['data'][0]['url']
+            content = {"prompt":key['prompt'],"url":image_url}
+            dalle_res.append(content)
+        if length == 0: 
+            with open('./Results/dalle_results_0shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
+        elif length==5:
+            with open('./Results/dalle_results_5shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
+        else:
+            with open('./Results/dalle_results_50shot.json', "w") as file:
+                for elem in dalle_res:
+                    file.write(json.dumps(dict(elem)))
+                    file.write(","+'\n')
 
 '''
 #################################################################################
