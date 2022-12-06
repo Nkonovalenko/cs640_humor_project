@@ -71,7 +71,7 @@ def request(prompt, FINETUNED):
 
 idioms = []
 def parse_idioms():
-    idioms_file = open('Data/idioms.txt', 'r')
+    idioms_file = open('../Data/idioms.txt', 'r')
 
     for line in idioms_file.readlines():
         line = line.replace('\n', "")
@@ -87,35 +87,6 @@ def save_meanings(start_index, end_index, idiom_meanins):
 
 parse_idioms()
 
-idiom_meanings = {}
-def gpt_idioms(start_index, end_index):
-    for index in range(start_index, end_index):
-        # Create the prompt
-        prompt = "What does it mean to be " + idioms[index]
-
-        # Make request to GPT-3 API
-        response = openai.Completion.create(
-            model="text-davinci-002",
-            prompt=prompt,
-            temperature=0.6,
-            max_tokens=150,
-            top_p=1,
-            frequency_penalty=1,
-            presence_penalty=1,
-        )
-
-        response_text = response['choices'][0]['text']
-
-        # Store the text response in dictionary
-        idiom_meanings[prompt] = response_text
-
-        # Write the dictionary to text file
-        save_meanings(start_index, end_index, idiom_meanings)
-
-        # Output for debugging
-        print("Prompt: ", prompt)
-        print("Response: ", response_text)
-        print('--------')
 
 '''
 #################################################################################
@@ -228,13 +199,60 @@ if captions:
 #################################################################################
 #################################################################################
 '''
-run_idioms = False
+idiom_meanings = {}
+def gpt_idioms(start_index, end_index):
+    for index in range(start_index, end_index):
+        # Create the prompt
+        prompt = "What does the idiom \"" + idioms[index] + "\" mean?"
+
+        # Make request to GPT-3 API Davinci-002
+        response = openai.Completion.create(
+            model="text-davinci-002",
+            prompt=prompt,
+            temperature=0.6,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=1,
+            presence_penalty=1,
+        )
+
+        response_text = response['choices'][0]['text']
+
+        # Make request to GPT-3 Davinci-003
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0.6,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=1,
+            presence_penalty=1,
+        )
+
+        response_text03 = response['choices'][0]['text']
+
+        # Store the text response in dictionary
+        idiom_meanings[prompt+"-002"] = response_text
+        idiom_meanings[prompt+"-003"] = response_text03
+
+        # Write the dictionary to text file
+        save_meanings(start_index, end_index, idiom_meanings)
+
+        # Output for debugging
+        print("Prompt: ", prompt)
+        print("Response 002: ", response_text)
+        print("Response 003: ", response_text03)
+        
+        print('--------')
+
+
+run_idioms = True
 if (run_idioms):
     # First we need to parse the idioms
     parse_idioms()
-
-    start_index = 100
-    end_index = 200
+    
+    start_index = 0
+    end_index = 100
 
     # Make requests to GPT
     gpt_idioms(start_index, end_index)
