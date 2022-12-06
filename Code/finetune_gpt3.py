@@ -2,7 +2,7 @@
 This file is part of the semester project for CS 640 at Boston University.
 It is for experiments to further investigate claims in the paper "Do Androids Laugh at Electric Sheep",
 through several experiments:
-    1) Comparing zero-shot learning with few-shot learning on GPT-3 on a set of New Yorker Caption Contest Captions, to have it describe a humourous the setting on the captions and feed it to DALL-E 2 to generate funny pictures.
+    1) Comparing zero-shot learning with few-shot learning on GPT-3 on a set of New Yorker Caption Contest Captions, to have it describe a humourous setting on the captions and feed it to DALL-E 2 to generate funny pictures.
         Status: Completed
     2) Running idioms through GPT-3 to see whether it can explain what those idioms mean
         Status: Completed
