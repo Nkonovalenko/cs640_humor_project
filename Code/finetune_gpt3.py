@@ -127,19 +127,6 @@ def gpt_idioms(start_index, end_index):
 #################################################################################
 '''
 
-'''
-    This section is still in progress. Manually creating a dataset that GPT can be fine tuned with.
-
-    Tried to get GPT to tell jokes with the captions being punch lines, however this fails:
-
-    Prompt:  Tell a joke about Yeah, I hate the throwback uniforms, too.
-    Response:
-
-    Why did the chicken cross the road?
-
-    To get to the other side.
-'''
-
 captions = False  
 make_text = True ## generate gpt3 outputs in /Results/gpt_results_*shot.json
 dalle = True    ##generate dalle2 outputs in /Results/dalle_results_*shots.json
